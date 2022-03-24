@@ -1,0 +1,391 @@
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix bn: <http://skidmore.edu/cs277/semantic/bn#>
+
+
+###############################################
+#Define all "upper" classes
+###############################################
+
+
+bn:DF a owl:Class .
+bn:Probability a owl:Class .
+bn:Set a owl:Class .
+
+
+
+###############################################
+#Define all properties for each classes
+###############################################
+
+
+bn:infers a owl:ObjectProperty;
+    rdfs:domain bn:DF;
+    rdfs:range bn:DF .
+
+bn:given a owl:ObjectProperty;
+    owl:inverseOf bn:infers .
+ 
+bn:hasChild a owl:ObjectProperty;
+    owl:equivalentProperty bn:infers;
+    owl:inverseOf bn:given .
+    
+bn:hasParent a owl:ObjectProperty;
+    owl:equivalentProperty bn:given;
+    owl:inverseOf bn:hasChild;
+    owl:inverseOf bn:infers .
+
+bn:contains a owl:ObjectProperty;
+    rdfs:domain bn:Set;
+    rdfs:range bn:DF .
+
+bn:belongsTo a owl:ObjectProperty;
+    owl:inverseOf bn:contains .
+
+bn:hasProbability a owl:ObjectProperty;
+    rdfs:domain bn:Set;
+    rdfs:range bn:Probability .
+
+bn:hasValue a owl:DataProperty;
+    rdfs:domain bn:Probability .
+ 
+bn:hasV a owl:DataProperty;
+    rdfs:domain bn:DF .
+
+
+
+###############################################
+#Restrain certain properties on some classes
+###############################################
+
+
+bn:DF rdfs:subClassOf
+    [a owl:Restriction;
+    owl:onProperty bn:hasV;
+    owl:cardinality 1] .
+
+bn:Set rdfs:subClassOf
+    [a owl:Restriction;
+    owl:onProperty bn:hasProbability;
+    owl:cardinality 1] .
+
+bn:Probability rdfs:subClassOf
+    [a owl:Restriction;
+    owl:onProperty bn:hasValue;
+    owl:cardinality 1] .
+
+
+
+###############################################
+#Define instances for nodes in Bayesian Networks
+###############################################
+
+
+bn:B rdfs:subClassOf bn:DF .
+bn:B1 a bn:B .
+bn:B0 a bn:B .
+
+bn:E rdfs:subClassOf bn:DF .
+bn:E1 a bn:E .
+bn:E0 a bn:E .
+
+bn:A rdfs:subClassOf bn:DF .
+bn:A1 a bn:A .
+bn:A0 a bn:A .
+
+bn:J rdfs:subClassOf bn:DF .
+bn:J1 a bn:J .
+bn:J0 a bn:J .
+
+bn:M rdfs:subClassOf bn:DF .
+bn:M1 a bn:M .
+bn:M0 a bn:M .
+
+
+###############################################
+#Assign values to each instances of nodes
+###############################################
+
+bn:B1 bn:hasV "true" .
+bn:B0 bn:hasV "false" .
+
+bn:E1 bn:hasV "true" .
+bn:E0 bn:hasV "false" .
+
+bn:A1 bn:hasV "true" .
+bn:A0 bn:hasV "false" .
+
+bn:J1 bn:hasV "true" .
+bn:J0 bn:hasV "false" .
+
+bn:M1 bn:hasV "true" .
+bn:M0 bn:hasV "false" .
+
+
+###############################################
+#differentiate all nodes instances
+###############################################
+
+[] a owl:AllDifferent;
+    owl:distinctMembers (bn:B bn:E bn:A bn:J bn:M) .
+
+    
+[] a owl:AllDifferent;
+    owl:distinctMembers (bn:B1 bn:B0 bn:E1 bn:E0 bn:A1 bn:A0 bn:J1 bn:J0 bn:M1 bn:M0) .
+
+
+###############################################
+#CPT under B
+###############################################
+
+bn:Set1 a bn:Set .
+bn:Probability1 a bn:Probability .
+bn:Set1 bn:contains bn:B1;
+    bn:hasProbability bn:Probability1 .
+    
+bn:Set2 a bn:Set .
+bn:Probability2 a bn:Probability .
+bn:Set2 bn:contains bn:B0;
+    bn:hasProbability bn:Probability2 .
+
+
+###############################################
+#CPT under E
+###############################################
+    
+bn:Set3 a bn:Set .
+bn:Probability3 a bn:Probability .
+bn:Set3 bn:contains bn:E1;
+    bn:hasProbability bn:Probability3 .
+
+bn:Set4 a bn:Set .
+bn:Probability4 a bn:Probability .
+bn:Set4 bn:contains bn:E0;
+    bn:hasProbability bn:Probability4 .
+    
+
+###############################################
+#CPT under A
+###############################################
+
+bn:B1 bn:infers bn:A1 .
+bn:E1 bn:infers bn:A1 .
+bn:Set5 a bn:Set .
+bn:Probability5 a bn:Probability .
+bn:Set5 bn:contains bn:B1;
+    bn:contains bn:E1;
+    bn:contains bn:A1;
+    bn:hasProbability bn:Probability5 .
+
+bn:B1 bn:infers bn:A0 .
+bn:E1 bn:infers bn:A0 .
+bn:Set6 a bn:Set .
+bn:Probability6 a bn:Probability .
+bn:Set6 bn:contains bn:B1;
+    bn:contains bn:E1;
+    bn:contains bn:A0;
+    bn:hasProbability bn:Probability6 .
+
+
+bn:B1 bn:infers bn:A1 .
+bn:E0 bn:infers bn:A1 .
+bn:Set7 a bn:Set .
+bn:Probability7 a bn:Probability .
+bn:Set7 bn:contains bn:B1;
+    bn:contains bn:E0;
+    bn:contains bn:A1;
+    bn:hasProbability bn:Probability7 .
+
+bn:B1 bn:infers bn:A0 .
+bn:E0 bn:infers bn:A0 .
+bn:Set8 a bn:Set .
+bn:Probability8 a bn:Probability .
+bn:Set8 bn:contains bn:B1;
+    bn:contains bn:E0;
+    bn:contains bn:A0;
+    bn:hasProbability bn:Probability8 .
+
+
+bn:B0 bn:infers bn:A1 .
+bn:E1 bn:infers bn:A1 .
+bn:Set9 a bn:Set .
+bn:Probability9 a bn:Probability .
+bn:Set9 bn:contains bn:B0;
+    bn:contains bn:E1;
+    bn:contains bn:A1;
+    bn:hasProbability bn:Probability9 .
+
+bn:B0 bn:infers bn:A0 .
+bn:E1 bn:infers bn:A0 .
+bn:Set10 a bn:Set .
+bn:Probability10 a bn:Probability .
+bn:Set10 bn:contains bn:B0;
+    bn:contains bn:E1;
+    bn:contains bn:A0;
+    bn:hasProbability bn:Probability10 .
+
+
+bn:B0 bn:infers bn:A1 .
+bn:E0 bn:infers bn:A1 .
+bn:Set11 a bn:Set .
+bn:Probability11 a bn:Probability .
+bn:Set11 bn:contains bn:B0;
+    bn:contains bn:E0;
+    bn:contains bn:A1;
+    bn:hasProbability bn:Probability11 .
+
+bn:B0 bn:infers bn:A0 .
+bn:E0 bn:infers bn:A0 .
+bn:Set12 a bn:Set .
+bn:Probability12 a bn:Probability .
+bn:Set12 bn:contains bn:B0;
+    bn:contains bn:E0;
+    bn:contains bn:A0;
+    bn:hasProbability bn:Probability12 .
+
+
+
+###############################################
+#CPT under J
+###############################################
+
+bn:A1 bn:infers bn:J1 .
+bn:Set13 a bn:Set .
+bn:Probability13 a bn:Probability .
+bn:Set13 bn:contains bn:A1;
+    bn:contains bn:J1;
+    bn:hasProbability bn:Probability13 .
+
+bn:A1 bn:infers bn:J0 .
+bn:Set14 a bn:Set .
+bn:Probability14 a bn:Probability .
+bn:Set14 bn:contains bn:A1;
+    bn:contains bn:J0;
+    bn:hasProbability bn:Probability14 .
+
+bn:A0 bn:infers bn:J1 .
+bn:Set15 a bn:Set .
+bn:Probability15 a bn:Probability .
+bn:Set15 bn:contains bn:A0;
+    bn:contains bn:J1;
+    bn:hasProbability bn:Probability15 .
+
+bn:A0 bn:infers bn:J0 .
+bn:Set16 a bn:Set .
+bn:Probability16 a bn:Probability .
+bn:Set16 bn:contains bn:A0;
+    bn:contains bn:J0;
+    bn:hasProbability bn:Probability16 .
+
+
+###############################################
+#CPT under M
+###############################################
+
+bn:A1 bn:infers bn:M1 .
+bn:Set17 a bn:Set .
+bn:Probability17 a bn:Probability .
+bn:Set17 bn:contains bn:A1;
+    bn:contains bn:M1;
+    bn:hasProbability bn:Probability17 .
+
+bn:A1 bn:infers bn:M0 .
+bn:Set18 a bn:Set .
+bn:Probability18 a bn:Probability .
+bn:Set18 bn:contains bn:A1;
+    bn:contains bn:M0;
+    bn:hasProbability bn:Probability18 .
+
+bn:A0 bn:infers bn:M1 .
+bn:Set19 a bn:Set .
+bn:Probability19 a bn:Probability .
+bn:Set19 bn:contains bn:A0;
+    bn:contains bn:M1;
+    bn:hasProbability bn:Probability19 .
+
+bn:A0 bn:infers bn:M0 .
+bn:Set20 a bn:Set .
+bn:Probability20 a bn:Probability .
+bn:Set20 bn:contains bn:A0;
+    bn:contains bn:M0;
+    bn:hasProbability bn:Probability20 .
+
+
+###############################################
+#Differentiate Set and Probability
+###############################################
+
+[] a owl:AllDifferent;
+    owl:distinctMembers (bn:Set1 bn:Set2 bn:Set3 bn:Set4 bn:Set5 bn:Set6 bn:Set7 bn:Set8 bn:Set9 bn:Set10 bn:Set11 bn:Set12 bn:Set13 bn:Set14 bn:Set15 bn:Set16 bn:Set17 bn:Set18 bn:Set19 bn:Set20) .
+     
+[] a owl:AllDifferent;
+    owl:distinctMembers (bn:Probability1 bn:Probability2 bn:Probability3 bn:Probability4 bn:Probability5 bn:Probability6 bn:Probability7 bn:Probability8 bn:Probability9 bn:Probability10 bn:Probability11 bn:Probability12 bn:Probability13 bn:Probability14 bn:Probability15 bn:Probability16 bn:Probability17 bn:Probability18 bn:Probability19 bn:Probability20) .
+ 
+ 
+###############################################
+#Stating that the given instances are the only member for a given class
+###############################################
+
+bn:Df owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:B bn:E bn:A bn:J bn:M) ] .
+
+bn:B owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:B1 bn:B0) ] .
+
+bn:E owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:E1 bn:E0) ] .
+
+bn:A owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:A1 bn:A0) ] .
+
+bn:J owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:J1 bn:J0) ] .
+
+bn:M owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:M1 bn:M0) ] .
+
+
+
+bn:Set owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:Set1 bn:Set2 bn:Set3 bn:Set4 bn:Set5 bn:Set6 bn:Set7 bn:Set8 bn:Set9 bn:Set10 bn:Set11 bn:Set12 bn:Set13 bn:Set14 bn:Set15 bn:Set16 bn:Set17 bn:Set18 bn:Set19 bn:Set20) ] .
+
+
+bn:Probability owl:equivalentClass [
+    a owl:Class;
+    owl:oneOf (bn:Probability1 bn:Probability2 bn:Probability3 bn:Probability4 bn:Probability5 bn:Probability6 bn:Probability7 bn:Probability8 bn:Probability9 bn:Probability10 bn:Probability11 bn:Probability12 bn:Probability13 bn:Probability14 bn:Probability15 bn:Probability16 bn:Probability17 bn:Probability18 bn:Probability19 bn:Probability20) ] .
+
+
+###############################################
+#Plug in real number
+###############################################
+
+
+bn:Probability1 bn:hasValue "0.001"^^xsd:double .
+bn:Probability2 bn:hasValue "0.999"^^xsd:double .
+bn:Probability3 bn:hasValue "0.002"^^xsd:double .
+bn:Probability4 bn:hasValue "0.998"^^xsd:double .
+bn:Probability5 bn:hasValue "0.95"^^xsd:double .
+bn:Probability6 bn:hasValue "0.05"^^xsd:double .
+bn:Probability7 bn:hasValue "0.94"^^xsd:double .
+bn:Probability8 bn:hasValue "0.06"^^xsd:double .
+bn:Probability9 bn:hasValue "0.29"^^xsd:double .
+bn:Probability10 bn:hasValue "0.71"^^xsd:double .
+bn:Probability11 bn:hasValue "0.001"^^xsd:double .
+bn:Probability12 bn:hasValue "0.999"^^xsd:double .
+bn:Probability13 bn:hasValue "0.90"^^xsd:double .
+bn:Probability14 bn:hasValue "0.10"^^xsd:double .
+bn:Probability15 bn:hasValue "0.05"^^xsd:double .
+bn:Probability16 bn:hasValue "0.95"^^xsd:double .
+bn:Probability17 bn:hasValue "0.70"^^xsd:double .
+bn:Probability18 bn:hasValue "0.30"^^xsd:double .
+bn:Probability19 bn:hasValue "0.01"^^xsd:double .
+bn:Probability20 bn:hasValue "0.99"^^xsd:double .
